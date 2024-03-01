@@ -6,7 +6,11 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"sync"
+	"time"
+
+	ics "github.com/arran4/golang-ical"
 )
 
 type ApiResponse struct {
@@ -30,20 +34,9 @@ type Class struct {
 	Date     string `json:"DATE"`
 }
 
-type Calendar []Class
-
-const (
-	statusSuccess = "success"
-	apiURL        = ""
-	authToken     = ""
-)
-
 func main() {
 	// Create a new HTTP client.
 	client := &http.Client{}
-
-	// Create Calendar.
-	var Cal Calendar
 
 	// Make a channel to pass results.
 	ch := make(chan []Class, 42*10)
@@ -104,8 +97,44 @@ func main() {
 	close(ch)
 
 	// Read the data from the channel.
-	for classes := range ch {
-		Cal = append(Cal, classes...)
+	var Classes []Class
+	for classList := range ch {
+		Classes = append(Classes, classList...)
 	}
+
+	log.Printf("Got timetable, %d events found", len(Classes))
+
+	// Create a calendar.
+	cal := ics.NewCalendar()
+
+	for _, c := range Classes {
+		ev := cal.AddEvent(generateUID(c.Start, c.End))
+		ev.SetSummary(c.Course + " - " + c.Type)
+		start, end, err := parseStartEnd(c.Start, c.End, c.Date)
+		if err != nil {
+			log.Println("failed parsing event time for event:", err)
+			return
+		}
+		ev.SetCreatedTime(time.Now())
+		ev.SetDtStampTime(time.Now())
+		ev.SetModifiedAt(time.Now())
+		ev.SetStartAt(start)
+		ev.SetEndAt(end)
+		ev.SetLocation(c.Room + " - " + c.Building)
+	}
+
+	file, err := os.Create("timetable.ics")
+	if err != nil {
+		log.Println("could not create calendar file:", err)
+		return
+	}
+
+	err = cal.SerializeTo(file)
+	if err != nil {
+		log.Println("could not write calendar to file:", err)
+		return
+	}
+
+	log.Println("Generated .ics file at timetable.ics")
 
 }
