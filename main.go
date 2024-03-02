@@ -47,7 +47,7 @@ func main() {
 
 	tmpl = template.Must(tmpl.ParseFiles("./src/html/index.html"))
 
-	http.ListenAndServe("localhost:8080", nil)
+	http.ListenAndServe("0.0.0.0:10000", nil)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
