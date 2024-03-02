@@ -1,0 +1,19 @@
+{
+  "name": "tableturner",
+  "version": "0.0.1",
+  "description": "A simple web app to parse adelaide uni timetable data from their api to generate a .ics file",
+  "main": "main.go",
+  "scripts": {
+    "dev": "npx tailwindcss -i ./src/css/main.css -o ./dist/main.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/davidsutts/tableturner"
+  },
+  "author": "David Sutton",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@types/html": "^1.0.4",
+    "tailwindcss": "^3.4.1"
+  }
+}
