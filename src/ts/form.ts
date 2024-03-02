@@ -7,15 +7,15 @@ if (document.getElementById("gen-tt")) {
 	genBtn.addEventListener("click", submit);
 };
 
-// Add event listener to generate timetables button.
+// Get download link element.
 let dloadLink: HTMLAnchorElement;
 if (document.getElementById("download")) {
 	dloadLink = document.getElementById("download") as HTMLAnchorElement;
-	// dloadLink.addEventListener("click", download);
 };
 
 // Request timetable using api.
 function submit(): void {
+	console.log("HERE")
 	let xhr = new XMLHttpRequest();
 	xhr.open("POST", "api/generate");
 
@@ -29,6 +29,7 @@ function submit(): void {
 	xhr.addEventListener("loadend", () => {
 		if (xhr.status == 200) {
 			fileURL = URL.createObjectURL(new Blob([xhr.response], { type: xhr.responseType }));
+			dloadLink.classList.remove("hidden")
 			dloadLink.href = fileURL;
 		}
 	});
